@@ -1,0 +1,139 @@
+C51 COMPILER V9.54   MAIN                                                                  07/04/2023 11:46:39 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: E:\keil5\C51\BIN\C51.EXE main.c LARGE OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\
+                    -main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Delay.h"
+   3          #include "key.h"
+   4          #include "LCD.h"
+   5          #include "DS18B20.h"
+   6          #include "AT24C02.h"
+   7          
+   8          
+   9          float T = 0,H = 0;
+  10          unsigned int KeyNum = 0,MAX = 99,MIN = 20;
+  11          int flag = 0,select = 0;
+  12          
+  13          
+  14          void data_init();
+  15          void show();
+  16          
+  17          void main()
+  18          {
+  19   1          DS18B20_ConvertT();   //上电先转换一次温度，防止第一次读数据错误
+  20   1          Delay(1000);      //等待转换完成
+  21   1          data_init();
+  22   1        
+  23   1          LCD_init();
+*** WARNING C206 IN LINE 23 OF main.c: 'LCD_init': missing function-prototype
+  24   1        
+  25   1          LCD_ShowString(1,1,"T:");
+  26   1          LCD_ShowString(2,1,"H:");
+  27   1          LCD_ShowString(1,10,"MAX:");
+  28   1          LCD_ShowString(2,10,"MIN:");
+  29   1          
+  30   1          while(1) {
+  31   2              show();
+  32   2              KeyNum = mkey();
+  33   2              //未进入设置
+  34   2              if(flag == 0) {
+  35   3                  if(KeyNum==1) {
+  36   4      
+  37   4                  }
+  38   3                  else if(KeyNum==2) {
+  39   4      
+  40   4                  }
+  41   3                  else if(KeyNum==3) {
+  42   4                      flag = 1;
+  43   4                  }
+  44   3                  else if(KeyNum==4) {
+  45   4                      AT24C02_WriteByte(0,MAX%256);
+  46   4                      Delay(5);
+  47   4                      AT24C02_WriteByte(1,MAX/256);
+  48   4                      Delay(5);
+  49   4                      AT24C02_WriteByte(2,MIN%256);
+  50   4                      Delay(5);
+  51   4                      AT24C02_WriteByte(3,MIN/256);
+  52   4                      Delay(5);
+  53   4                  }
+C51 COMPILER V9.54   MAIN                                                                  07/04/2023 11:46:39 PAGE 2   
+
+  54   3              }
+  55   2              //进入设置
+  56   2              else if(flag == 1) {
+  57   3                  if(KeyNum==1 && flag == 1) {
+  58   4                      if(select == 0) {
+  59   5                          MAX++;
+  60   5                      } else if(select == -1) {
+  61   5                          MIN++;
+  62   5                      }
+  63   4                  }
+  64   3                  else if(KeyNum==2 && flag == 1) {
+  65   4                      if(select == 0) {
+  66   5                          MAX--;
+  67   5                      } else if(select == -1) {
+  68   5                          MIN--;
+  69   5                      }
+  70   4                  }
+  71   3                  else if(KeyNum==3 && flag == 1) {
+  72   4                      flag = 0;
+  73   4                  }
+  74   3                  else if(KeyNum==4 && flag == 1) {
+  75   4                      select = ~select;
+  76   4                  }
+  77   3              }
+  78   2              
+  79   2          }
+  80   1      }
+  81          
+  82          
+  83          
+  84          void data_init() {
+  85   1          MAX=AT24C02_ReadByte(0);
+  86   1          MAX|=AT24C02_ReadByte(1)<<8;
+  87   1          MIN=AT24C02_ReadByte(2);
+  88   1          MIN|=AT24C02_ReadByte(3)<<8;
+  89   1      }
+  90          void show()
+  91          {
+  92   1          DS18B20_ConvertT(); //转换温度
+  93   1          T=DS18B20_ReadT();  //读取温度
+  94   1          if(T<0)       //如果温度小于0
+  95   1          {
+  96   2              LCD_ShowChar(1,3,'-');  //显示负号
+  97   2              T=-T;     //将温度变为正数
+  98   2          }
+  99   1          else        //如果温度大于等于0
+ 100   1          {
+ 101   2              LCD_ShowChar(1,3,'+');  //显示正号
+ 102   2          }
+ 103   1          LCD_ShowNum(1,4,T,2);   //显示温度整数部分
+ 104   1          LCD_ShowChar(1,6,'.');    //显示小数点
+ 105   1          LCD_ShowNum(1,7,(unsigned long)(T*10000)%10000,3);//显示温度小数部分
+ 106   1          //
+ 107   1      
+ 108   1          LCD_ShowNum(1,15,MAX,2);
+ 109   1          LCD_ShowNum(2,15,MIN,2);
+ 110   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    727    ----
+   CONSTANT SIZE    =     16    ----
+C51 COMPILER V9.54   MAIN                                                                  07/04/2023 11:46:39 PAGE 3   
+
+   XDATA SIZE       =     18    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

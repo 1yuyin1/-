@@ -1,0 +1,66 @@
+C51 COMPILER V9.54   ESP                                                                   07/03/2023 11:22:18 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE ESP
+OBJECT MODULE PLACED IN .\Objects\esp.obj
+COMPILER INVOKED BY: E:\keil5\C51\BIN\C51.EXE esp.c LARGE OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\e
+                    -sp.lst) TABS(2) OBJECT(.\Objects\esp.obj)
+
+line level    source
+
+   1          #include <REGX51.H>
+   2          #include "Usart.h"
+   3          #include "Delay.h"
+   4          
+   5          #include <stdio.h>
+   6          
+   7          void initEsp8266()
+   8          {
+   9   1          Delay(300);
+  10   1          sendString("AT+CWMODE=1\r\n");    //设置WIFI应用模式
+  11   1          Delay(300);           //设置WIFI应用模式
+  12   1          sendString("AT+CWJAP=\"Nice\",\"123123123\"\r\n");//连接无线路由器
+  13   1          Delay(6000);
+  14   1          sendString("AT+CIPSTART=\"TCP\",\"183.230.40.33\",80\r\n");//连接无线路由器
+  15   1          Delay(300);
+  16   1          sendString("AT+CIPMODE=1");
+  17   1          Delay(300);
+  18   1          sendString("AT+CIPSEND");
+  19   1      }
+  20          
+  21          void esp8266_send_data(char *key,float value) {
+  22   1          char http_request[] = "POST /devices/1105078952/datapoints?type=3 HTTP/1.1\r\n"
+  23   1                                "api-key:zFvYiU0L=BD9tqcU1WZCzYJQo7g=\r\n"
+  24   1                                "Host:api.heclouds.com\r\n"
+  25   1                                "Content-Length:150\r\n"
+  26   1                                "Content-Type: application/json\r\n\r\n"
+  27   1                                "{\"Data1\": 1}";
+  28   1          sprintf(http_request,
+  29   1                  "POST /devices/1105078952/datapoints?type=3 HTTP/1.1\r\n"
+  30   1                  "api-key:zFvYiU0L=BD9tqcU1WZCzYJQo7g=\r\n"
+  31   1                  "Host:api.heclouds.com\r\n"
+  32   1                  "Content-Length:150\r\n"
+  33   1                  "Content-Type: application/json\r\n\r\n"
+  34   1                  "{\"%s\": %f}",
+  35   1                  key,value);
+  36   1          sendString(http_request);
+  37   1      }
+  38          
+  39          
+  40          
+  41          
+  42          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    187    ----
+   CONSTANT SIZE    =    467    ----
+   XDATA SIZE       =   ----     188
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
